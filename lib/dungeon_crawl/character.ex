@@ -5,7 +5,7 @@ defmodule DungeonCrawl.Character do
     hit_points: non_neg_integer,
     max_hit_points: non_neg_integer,
     attack_description: String.t,
-    damege_range: Range.t,
+    damage_range: Range.t,
   }
 
   defstruct name: nil,
