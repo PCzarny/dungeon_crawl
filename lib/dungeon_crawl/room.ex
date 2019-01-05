@@ -11,6 +11,11 @@ defmodule DungeonCrawl.Room do
       actions: [forward(), rest()]
     },
     %Room{
+      description: "You can see an enemy blocking your path.",
+      actions: [forward()],
+      trigger: Triggers.Enemy
+    },
+    %Room{
       description: "You can see the light of day. You found the exit.",
       actions: [forward()],
       trigger: Triggers.Exit
