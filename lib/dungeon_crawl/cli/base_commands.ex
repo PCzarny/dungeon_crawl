@@ -1,12 +1,6 @@
 defmodule DungeonCrawl.CLI.BaseCommands do
   alias Mix.Shell.IO, as: Shell
-
-  defp display_invalid_option do
-    Shell.cmd("clear")
-    Shell.error("Invalid option.")
-    Shell.prompt("Press Enter to try again")
-    Shell.cmd("clear")
-  end
+  @invalid_option{:error, "Invalid option"}
 
   defp display_options(options) do
     options
@@ -21,27 +15,38 @@ defmodule DungeonCrawl.CLI.BaseCommands do
     "Which one? [#{options}]\n"
   end
 
-  defp ask_for_index(options) do
-    answer =
+  def ask_for_option(options) do
+    try do
       options
-      |> display_options()
-      |> generate_question()
-      |> Shell.prompt()
-      |> Integer.parse()
+        |> display_options()
+        |> generate_question()
+        |> Shell.prompt()
+        |> parse_answer()
+        |> find_option_by_index(options)
+    catch
+      {:error, message} ->
+        display_error(message)
+        ask_for_option(options)
+    end
+  end
 
-    case answer do
+  def display_error(message) do
+    Shell.cmd("clear")
+    Shell.error(message)
+    Shell.prompt("Press Enter to try again")
+    Shell.cmd("clear")
+  end
+
+  def parse_answer(answer) do
+    case Integer.parse(answer) do
       :error ->
-        display_invalid_option()
-        ask_for_index(options)
+        throw @invalid_option
       {option, _} ->
         option - 1
     end
   end
 
-  def ask_for_option(options) do
-    index = ask_for_index(options)
-    chosen_option = Enum.at(options, index)
-
-    chosen_option || (display_invalid_option() && ask_for_index(options))
+  def find_option_by_index(index, options) do
+    Enum.at(options, index) || throw @invalid_option
   end
 end
